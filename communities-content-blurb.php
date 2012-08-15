@@ -203,7 +203,8 @@ class Content_Blurb extends WP_Widget {
     private function form_fields($fields, $instance){
         foreach($fields as &$field){
             extract($field);
-            
+            $label = (!isset($label)) ? null : $label;
+            $options = (!isset($options)) ? null : $options;
             $this->form_field($field_id, $type, $label, $instance, $options);
         }
     }
@@ -228,13 +229,13 @@ class Content_Blurb extends WP_Widget {
     private function form_field($field_id, $type, $label, $instance, $options = array()){
   
         ?><p><?php
-        
+        $input_value = (isset($instance[$field_id])) ? $instance[$field_id] : '';
         switch ($type){
             
             case 'text': ?>
             
                     <label for="<?php echo $this->get_field_id( $field_id ); ?>"><?php echo $label; ?>: </label>
-                    <input type="text" id="<?php echo $this->get_field_id( $field_id ); ?>" style="<?php echo $style; ?>" class="widefat" name="<?php echo $this->get_field_name( $field_id ); ?>" value="<?php echo $instance[$field_id]; ?>" />
+                    <input type="text" id="<?php echo $this->get_field_id( $field_id ); ?>" style="<?php echo (isset($style)) ? $style : ''; ?>" class="widefat" name="<?php echo $this->get_field_name( $field_id ); ?>" value="<?php echo $input_value; ?>" />
                 <?php break;
             
             case 'select': ?>
@@ -243,7 +244,7 @@ class Content_Blurb extends WP_Widget {
                         <?php
                             foreach ( $options as $value => $label ) :  ?>
                         
-                                <option value="<?php echo $value; ?>" <?php selected($value, $instance[$field_id]) ?>>
+                                <option value="<?php echo $value; ?>" <?php selected($value, $input_value) ?>>
                                     <?php echo $label ?>
                                 </option><?php
                                 
@@ -260,7 +261,7 @@ class Content_Blurb extends WP_Widget {
                 
                 ?>
                     <label for="<?php echo $this->get_field_id( $field_id ); ?>"><?php echo ($label)?$label.":":''; ?> </label>
-                    <textarea class="widefat" rows="<?php echo $rows; ?>" cols="<?php echo $cols; ?>" id="<?php echo $this->get_field_id($field_id); ?>" name="<?php echo $this->get_field_name($field_id); ?>"><?php echo $instance[$field_id]; ?></textarea>
+                    <textarea class="widefat" rows="<?php echo $rows; ?>" cols="<?php echo $cols; ?>" id="<?php echo $this->get_field_id($field_id); ?>" name="<?php echo $this->get_field_name($field_id); ?>"><?php echo $input_value; ?></textarea>
                 <?php break;
             
             case 'radio' :
