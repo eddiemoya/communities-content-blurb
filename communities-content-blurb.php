@@ -100,10 +100,20 @@ class Content_Blurb extends WP_Widget {
      */
     public function widget( $args, $instance ){
   
+		global $wp_query;
 		extract($args);
+		
 		$title = apply_filters( 'widget_title', empty( $instance['title'] ) ? '' : $instance['title'], $instance, $this->id_base );
 		$subtitle = apply_filters( 'widget_title', empty( $instance['subtitle'] ) ? '' : $instance['subtitle'], $instance, $this->id_base );
 		$text = apply_filters( 'widget_text', empty( $instance['text'] ) ? '' : $instance['text'], $instance );
+	print_pre($wp_query);	
+		$currCat = (!empty($wp_query->tax_query->queries[0])) ? $wp_query->tax_query->queries[0]['terms'][0] : null;
+	
+		if($instance['auto_detect'] && !empty($currCat))
+		{
+			$g = get_term_by("slug", $currCat , "category", "OBJECT");
+			$text = $g->description;
+		}
 
 		echo $before_widget;
 		if(!empty( $title ) || !empty( $subtitle )){
@@ -154,6 +164,9 @@ class Content_Blurb extends WP_Widget {
 		else
 			$instance['text'] = stripslashes( wp_filter_post_kses( addslashes($new_instance['text']) ) ); // wp_filter_post_kses() expects slashed
 		$instance['filter'] = isset($new_instance['filter']);
+		
+		$instance['auto_detect'] = (isset($new_instance['auto_detect'])) ? true : false;
+		
 		return $instance;
     }
     
@@ -183,6 +196,7 @@ class Content_Blurb extends WP_Widget {
 		$this->form_field('subtitle', 'text', 'Sub Title', $instance);
 		$this->form_field('text', 'textarea', '', $instance);
 		$this->form_field('filter', 'checkbox', 'Automatically add paragraphs', $instance);
+		$this->form_field('auto_detect', 'checkbox', 'Auto Detect Category', $instance);
     }
     
 
